@@ -41,7 +41,7 @@
             bottom: 0;
             background-color: white;
             opacity: 0.5;
-            animation: pulse 3s infinite;
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
@@ -136,7 +136,7 @@
             let gameTimer = 0;
             const TIME = 45
 
-
+            let disappears = [];
             let cells = [];
             let progress = 0
 
@@ -172,8 +172,23 @@
                 }
 
                 disappear() {
+                    disappears.push(this.type);
                     this.button.classList.add('disappear');
                     this.gone = true;
+
+                    if (progress >= 24) {
+                        alert('Success!');
+                    }
+                }
+
+                checkExtraPoints() {
+                    let lasts = disappears.slice(-3);
+                    if (new Set(lasts).size === 3) {
+                        progress += 1;
+                    }
+                    if (lasts[0] === lasts[1] && lasts[1] === lasts[2]) {
+                        progress += 2;
+                    }
                 }
 
                 click() {
@@ -181,14 +196,10 @@
                         return;
                     }
 
-
-
                     cells.forEach(cell => {
                         cell.clickable = false;
                         cell.button.classList.remove('clickable');
                     });
-
-
 
                     this.button.style.backgroundColor = 'rgb(82, 84, 86)';
                     lastClickedType = this.type;
@@ -196,10 +207,9 @@
                     if (this.clicked) {
                         this.disappear();
                         progress += 1;
+                        this.checkExtraPoints();
                         document.getElementById('progress').textContent = `${progress}/24`;
                     }
-
-
 
                     if (this.type === 'banana') {
                         // Find all cells next to this cell and set it to clickable
@@ -260,10 +270,6 @@
                                 cell.button.classList.add('clickable');
                             }
                         });
-
-
-
-
 
                     } else if (this.type === 'wolf') {
                         const index = cells.indexOf(this);
